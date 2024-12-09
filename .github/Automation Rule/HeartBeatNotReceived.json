@@ -1,0 +1,48 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/AutomationRules/7fecb9e3-bdcb-49ad-ac58-f12ddf051d53')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/7fecb9e3-bdcb-49ad-ac58-f12ddf051d53')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/AutomationRules",
+            "apiVersion": "2022-12-01-preview",
+            "properties": {
+                "displayName": "HeartBeatNotReceived",
+                "order": 1,
+                "triggeringLogic": {
+                    "isEnabled": true,
+                    "triggersOn": "Incidents",
+                    "triggersWhen": "Created",
+                    "conditions": [
+                        {
+                            "conditionType": "Property",
+                            "conditionProperties": {
+                                "propertyName": "IncidentRelatedAnalyticRuleIds",
+                                "operator": "Contains",
+                                "propertyValues": [
+                                    "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/', '48d99fcc-eedc-4b14-82c7-41e07dc0cb51')]"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "actions": [
+                    {
+                        "order": 1,
+                        "actionType": "RunPlaybook",
+                        "actionConfiguration": {
+                            "logicAppResourceId": "/subscriptions/aa71e3f3-4e5e-4323-9912-c6bc4509d415/resourceGroups/SaurabhRG/providers/Microsoft.Logic/workflows/HeartBeatNotReceived",
+                            "tenantId": "16b3c013-d300-468d-ac64-7eda0820b6d3"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
