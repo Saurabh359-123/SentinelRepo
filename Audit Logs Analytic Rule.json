@@ -1,0 +1,105 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspace": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "id": "[concat(resourceId('Microsoft.OperationalInsights/workspaces/providers', parameters('workspace'), 'Microsoft.SecurityInsights'),'/alertRules/cac17423-3a11-4c45-b87c-82c17252456e')]",
+            "name": "[concat(parameters('workspace'),'/Microsoft.SecurityInsights/cac17423-3a11-4c45-b87c-82c17252456e')]",
+            "type": "Microsoft.OperationalInsights/workspaces/providers/alertRules",
+            "kind": "Scheduled",
+            "apiVersion": "2023-12-01-preview",
+            "properties": {
+                "displayName": "AUTO DISABLED Logon Activity",
+                "description": "The alert rule was disabled due to too many consecutive failures. Reason: This rule was automatically disabled due to insufficient permissions. The rule requires permissions which are different from those held by the user who created the rule at the time of rule creation. This often happens due to changes in functions used or references to external data. Please edit and re-save the rule with a user that can execute the query in it. For troubleshooting guidance, see: https://aka.ms/AnalyticsAutoDisabledRules Logon Activity",
+                "severity": "Medium",
+                "enabled": false,
+                "query": "SecurityEvent\r\n| where EventID in ('4624', '4625')\r\n| extend SecurityActivity = iff(EventID == 4624, \"Successful Logon\", \"Failed Logon\")",
+                "queryFrequency": "PT5M",
+                "queryPeriod": "PT5M",
+                "triggerOperator": "GreaterThan",
+                "triggerThreshold": 0,
+                "suppressionDuration": "PT5H",
+                "suppressionEnabled": false,
+                "startTimeUtc": null,
+                "tactics": [
+                    "InitialAccess"
+                ],
+                "techniques": [],
+                "subTechniques": [],
+                "alertRuleTemplateName": null,
+                "incidentConfiguration": {
+                    "createIncident": true,
+                    "groupingConfiguration": {
+                        "enabled": true,
+                        "reopenClosedIncident": false,
+                        "lookbackDuration": "PT5H",
+                        "matchingMethod": "Selected",
+                        "groupByEntities": [
+                            "Account"
+                        ],
+                        "groupByAlertDetails": [],
+                        "groupByCustomDetails": [
+                            "SecurityActivity"
+                        ]
+                    }
+                },
+                "eventGroupingSettings": {
+                    "aggregationKind": "SingleAlert"
+                },
+                "alertDetailsOverride": {
+                    "alertDisplayNameFormat": "Alert generated for {{{SecurityActivity}} for Process {{{ProcessName}} ",
+                    "alertDescriptionFormat": "Alert Generated for {{{SecurityActivity}} for user {{{TargetAccount}} logged in from Host {{{Computer}}",
+                    "alertDynamicProperties": []
+                },
+                "customDetails": {
+                    "SecurityActivity": "SecurityActivity"
+                },
+                "entityMappings": [
+                    {
+                        "entityType": "Host",
+                        "fieldMappings": [
+                            {
+                                "identifier": "HostName",
+                                "columnName": "Computer"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "IP",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Address",
+                                "columnName": "IpAddress"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Account",
+                        "fieldMappings": [
+                            {
+                                "identifier": "Name",
+                                "columnName": "TargetAccount"
+                            }
+                        ]
+                    },
+                    {
+                        "entityType": "Process",
+                        "fieldMappings": [
+                            {
+                                "identifier": "ProcessId",
+                                "columnName": "ProcessName"
+                            }
+                        ]
+                    }
+                ],
+                "sentinelEntitiesMappings": null,
+                "templateVersion": null
+            }
+        }
+    ]
+}
